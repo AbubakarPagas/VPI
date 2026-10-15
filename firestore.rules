@@ -1,0 +1,149 @@
+rules_version = '2';
+
+// ── VPI Secure — Firestore Security Rules ─────────────────────────────────────
+//
+// Principle: each authenticated user may read and write only their own
+// profile document.  Trusted verification fields can NEVER be set or
+// overwritten by the client.
+//
+// ── Document layout: users/{uid} ─────────────────────────────────────────────
+//
+//   Self-service fields (client may write):
+//     fullName         string   — display name, entered by the user
+//     nameSource       string   — always "self_declared" from the client
+//     profileCompleted bool     — true once fullName has been saved
+//     updatedAt        timestamp
+//
+//   Bootstrap fields (written once on document creation, never updated):
+//     phoneNumber      string
+//     uid              string
+//     createdAt        timestamp  — immutable after creation
+//     schemaVersion    int
+//
+//   Trusted / server-only fields (never written by the client):
+//     verificationStatus           string
+//     ninVerified                  bool
+//     trustScore                   number
+//     deviceVerificationStatus     string
+//     identityVerificationStatus   string
+//     protectionActivationStatus   string
+//
+// ── Rules summary ─────────────────────────────────────────────────────────────
+//
+//   read   — authenticated user may read their own document only
+//   create — authenticated user may create their own document, subject to:
+//              • document ID == request.auth.uid
+//              • only allowed bootstrap + self-service fields present
+//              • no trusted / server-side fields present
+//   update — authenticated user may update their own document, subject to:
+//              • only the four self-service fields may change
+//              • createdAt, uid, phoneNumber, schemaVersion are immutable
+//              • trusted fields may not be written
+//   delete — not permitted from the client
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Users collection ───────────────────────────────────────────────────
+    match /users/{userId} {
+
+      // ── Read ──────────────────────────────────────────────────────────────
+      allow read: if request.auth != null
+                  && request.auth.uid == userId;
+
+      // ── Create ────────────────────────────────────────────────────────────
+      // Permitted only when:
+      //   1. The authenticated user is creating their own document.
+      //   2. The incoming data contains only the allowed fields.
+      //   3. No trusted / server-managed fields are present.
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && _onlyAllowedCreateFields(request.resource.data)
+                    && _noTrustedFields(request.resource.data);
+
+      // ── Update ────────────────────────────────────────────────────────────
+      // Permitted only when:
+      //   1. The authenticated user is updating their own document.
+      //   2. Only the four self-service fields are being changed.
+      //   3. Immutable fields are not being changed.
+      //   4. No trusted fields are being written.
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && _onlySelfServiceFieldsChanged(request.resource.data,
+                                                     resource.data)
+                    && _noTrustedFields(request.resource.data)
+                    && _immutableFieldsUnchanged(request.resource.data,
+                                                  resource.data);
+
+      // ── Delete ────────────────────────────────────────────────────────────
+      allow delete: if false;
+    }
+
+    // ── All other collections — deny by default ────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helper functions
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Fields the client is allowed to provide when creating a new profile document.
+function _allowedCreateFields() {
+  return [
+    'fullName',
+    'nameSource',
+    'profileCompleted',
+    'phoneNumber',
+    'uid',
+    'createdAt',
+    'updatedAt',
+    'schemaVersion'
+  ];
+}
+
+// Returns true when the incoming document contains no keys outside the
+// allowed create set.
+function _onlyAllowedCreateFields(data) {
+  return data.keys().hasOnly(_allowedCreateFields());
+}
+
+// Returns true when the incoming document contains none of the trusted fields
+// that only backend functions or the Firebase Admin SDK may write.
+function _noTrustedFields(data) {
+  return !data.keys().hasAny([
+    'verificationStatus',
+    'ninVerified',
+    'trustScore',
+    'deviceVerificationStatus',
+    'identityVerificationStatus',
+    'protectionActivationStatus'
+  ]);
+}
+
+// Returns true when only the four self-service fields differ between the
+// incoming document and the current document.
+function _onlySelfServiceFieldsChanged(incoming, existing) {
+  // Build the set of keys that are actually changing.
+  // A key is considered "changed" if it appears in the incoming data with a
+  // different value than in the existing data, or if it's a new key.
+  //
+  // Because Cloud Firestore Rules don't have set-difference helpers we use
+  // hasOnly on the diff() result instead.
+  return incoming.diff(existing).affectedKeys().hasOnly([
+    'fullName',
+    'nameSource',
+    'profileCompleted',
+    'updatedAt'
+  ]);
+}
+
+// Returns true when immutable bootstrap fields have not been altered.
+function _immutableFieldsUnchanged(incoming, existing) {
+  return incoming.get('createdAt', null) == existing.get('createdAt', null)
+      && incoming.get('uid', null)       == existing.get('uid', null)
+      && incoming.get('phoneNumber', null) == existing.get('phoneNumber', null)
+      && incoming.get('schemaVersion', null) == existing.get('schemaVersion', null);
+}

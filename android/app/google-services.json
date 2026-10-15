@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "348485986281",
+    "project_id": "vpi-68835",
+    "storage_bucket": "vpi-68835.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348485986281:android:c8b45aebe582315dc28d78",
+        "android_client_info": {
+          "package_name": "com.vpi.secure"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrhR6DyPKpHpc7PjI23KY-3j4JgqXwm0k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
