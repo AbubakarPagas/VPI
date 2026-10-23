@@ -43,7 +43,7 @@ import '../../core/utils/phone_mask.dart';
 import '../controllers/phone_login_controller.dart';
 import '../services/firebase_phone_auth_service.dart';
 import '../services/user_profile_service.dart';
-import '../../home/vpi_dashboard_screen.dart';
+import '../../home/shell/main_shell.dart';
 import 'phone_login_screen.dart';
 import 'profile_completion_screen.dart';
 
@@ -341,7 +341,7 @@ class _PhoneOtpScreenState extends State<PhoneOtpScreen>
   void _navigateToDashboard(User user) {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (ctx, animation, secAnim) => VpiDashboardScreen(user: user),
+        pageBuilder: (ctx, animation, secAnim) => MainShell(user: user),
         transitionsBuilder: (ctx, animation, secAnim, child) => FadeTransition(
           opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
           child: child,

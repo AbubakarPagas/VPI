@@ -61,7 +61,16 @@ const double _kMaxContentWidth = 600;
 class VpiDashboardScreen extends StatefulWidget {
   final User user;
 
-  const VpiDashboardScreen({super.key, required this.user});
+  /// Called when the user taps the notification bell.
+  /// In [MainShell] this switches to the Alerts tab instead of pushing a
+  /// new route, keeping the tab's state alive.
+  final VoidCallback? onBellTap;
+
+  const VpiDashboardScreen({
+    super.key,
+    required this.user,
+    this.onBellTap,
+  });
 
   @override
   State<VpiDashboardScreen> createState() => _VpiDashboardScreenState();
@@ -116,9 +125,15 @@ class _VpiDashboardScreenState extends State<VpiDashboardScreen> {
         .push(_slideRoute<void>(ProfileScreen(user: widget.user)));
   }
 
-  void _goToAlerts() {
-    Navigator.of(context)
-        .push(_slideRoute<void>(const AlertsScreen(unreadCount: 0)));
+  /// Delegates to [MainShell.switchToAlerts] when available (tab mode),
+  /// or falls back to pushing AlertsScreen as a full route (standalone use).
+  void _onBellTap() {
+    if (widget.onBellTap != null) {
+      widget.onBellTap!();
+    } else {
+      Navigator.of(context)
+          .push(_slideRoute<void>(const AlertsScreen(unreadCount: 0)));
+    }
   }
 
   // Feature screens — refresh trust data on return so any status change
@@ -160,7 +175,7 @@ class _VpiDashboardScreenState extends State<VpiDashboardScreen> {
     final appBar = DashboardAppBar(
       profileState: _profileCtrl.state,
       onAvatarTap: _goToProfile,
-      onBellTap: _goToAlerts,
+      onBellTap: _onBellTap,
       unreadCount: 0,
     );
 

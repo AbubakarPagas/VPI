@@ -26,7 +26,6 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../core/theme/app_colors.dart';
@@ -125,17 +124,12 @@ class _CardLoaded extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Animated ring
-              _ScoreRing(
-                score: record.score,
-                reduceMotion: reduceMotion,
-              ),
+              _ScoreRing(score: record.score, reduceMotion: reduceMotion),
 
               const SizedBox(width: AppSpacing.lg),
 
               // Explanation text
-              Expanded(
-                child: _ScoreExplanation(record: record),
-              ),
+              Expanded(child: _ScoreExplanation(record: record)),
             ],
           ),
 
@@ -230,9 +224,7 @@ class _ScoreRingState extends State<_ScoreRing>
             child: child,
           );
         },
-        child: Center(
-          child: _ScoreLabel(score: score),
-        ),
+        child: Center(child: _ScoreLabel(score: score)),
       ),
     );
   }
@@ -250,7 +242,7 @@ class _ScoreRingState extends State<_ScoreRing>
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _RingPainter extends CustomPainter {
-  final double fraction;   // 0.0 – 1.0
+  final double fraction; // 0.0 – 1.0
   final Color trackColor;
   final Color ringColor;
   final double strokeWidth;
@@ -320,9 +312,7 @@ class _ScoreLabel extends StatelessWidget {
           style: GoogleFonts.rajdhani(
             fontSize: 28,
             fontWeight: FontWeight.w800,
-            color: score != null
-                ? _scoreColor(score!)
-                : AppColors.textMuted,
+            color: score != null ? _scoreColor(score!) : AppColors.textMuted,
             height: 1.0,
             letterSpacing: 1.0,
           ),
@@ -363,7 +353,8 @@ class _ScoreExplanation extends StatelessWidget {
     } else if (score >= 70) {
       body = 'Your trust profile looks strong. Keep your verifications up to date.';
     } else if (score >= 40) {
-      body = 'Some checks are still pending. Complete them to improve your score.';
+      body =
+          'Some checks are still pending. Complete them to improve your score.';
     } else {
       body = 'Your trust profile needs attention. Complete the steps below.';
     }
@@ -418,17 +409,12 @@ class _UpdatedNotice extends StatelessWidget {
     return Row(
       children: [
         Icon(
-          isCached
-              ? Icons.cloud_off_outlined
-              : Icons.update_rounded,
+          isCached ? Icons.cloud_off_outlined : Icons.update_rounded,
           size: AppSpacing.iconXS,
           color: AppColors.textMuted,
         ),
         const SizedBox(width: AppSpacing.xs),
-        Text(
-          _label,
-          style: AppTextStyles.caption,
-        ),
+        Text(_label, style: AppTextStyles.caption),
       ],
     );
   }
@@ -567,15 +553,9 @@ class _CardError extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Could not load score',
-                  style: AppTextStyles.bodyStrong,
-                ),
+                Text('Could not load score', style: AppTextStyles.bodyStrong),
                 const SizedBox(height: AppSpacing.xs),
-                Text(
-                  message,
-                  style: AppTextStyles.bodySmall,
-                ),
+                Text(message, style: AppTextStyles.bodySmall),
               ],
             ),
           ),
@@ -619,9 +599,7 @@ class _BreakdownSheet extends StatelessWidget {
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(AppSpacing.radiusXL),
             ),
-            border: Border(
-              top: BorderSide(color: AppColors.divider),
-            ),
+            border: Border(top: BorderSide(color: AppColors.divider)),
           ),
           child: Column(
             children: [
@@ -751,10 +729,10 @@ class _BreakdownScoreRow extends StatelessWidget {
     final color = score == null
         ? AppColors.textMuted
         : score >= 70
-            ? AppColors.trusted
-            : score >= 40
-                ? AppColors.warning
-                : AppColors.danger;
+        ? AppColors.trusted
+        : score >= 40
+        ? AppColors.warning
+        : AppColors.danger;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -780,10 +758,7 @@ class _BreakdownScoreRow extends StatelessWidget {
                 color: AppColors.textMuted,
               ),
             ),
-            Text(
-              'TRUST SCORE',
-              style: AppTextStyles.scoreLabel,
-            ),
+            Text('TRUST SCORE', style: AppTextStyles.scoreLabel),
           ],
         ),
         const Spacer(),
@@ -879,8 +854,7 @@ class _BreakdownStepRow extends StatelessWidget {
                         horizontal: 7,
                         vertical: 2,
                       ),
-                      decoration:
-                          AppDecorations.chipDecoration(_statusColor),
+                      decoration: AppDecorations.chipDecoration(_statusColor),
                       child: Text(
                         status.label.toUpperCase(),
                         style: AppTextStyles.labelSmall.copyWith(
@@ -892,10 +866,7 @@ class _BreakdownStepRow extends StatelessWidget {
                     ),
                     if (_timestampLabel != null) ...[
                       const SizedBox(width: AppSpacing.xs),
-                      Text(
-                        '· $_timestampLabel',
-                        style: AppTextStyles.caption,
-                      ),
+                      Text('· $_timestampLabel', style: AppTextStyles.caption),
                     ],
                   ],
                 ),

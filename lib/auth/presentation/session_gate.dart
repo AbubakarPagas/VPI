@@ -34,7 +34,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../features/onboarding/screens/onboarding_screen.dart';
-import '../../home/vpi_dashboard_screen.dart';
+import '../../home/shell/main_shell.dart';
 import '../services/user_profile_service.dart';
 import 'phone_login_screen.dart';
 import 'profile_completion_screen.dart';
@@ -138,7 +138,7 @@ class _SessionGateState extends State<SessionGate> {
   );
 
   Route<void> _dashboardRoute(User user) => PageRouteBuilder<void>(
-    pageBuilder: (_, _, _) => VpiDashboardScreen(user: user),
+    pageBuilder: (_, _, _) => MainShell(user: user),
     transitionsBuilder: _fade,
     transitionDuration: const Duration(milliseconds: 500),
   );

@@ -37,7 +37,11 @@ import '../widgets/dashboard_avatar.dart';
 class ProfileScreen extends StatefulWidget {
   final User user;
 
-  const ProfileScreen({super.key, required this.user});
+  /// When [true] this screen is rendered as a bottom-nav tab body.
+  /// The back button is hidden — the user switches tabs instead.
+  final bool isTab;
+
+  const ProfileScreen({super.key, required this.user, this.isTab = false});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -140,21 +144,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildTopBar() {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
+      padding: EdgeInsets.fromLTRB(
+        widget.isTab ? AppSpacing.base : AppSpacing.sm,
+        widget.isTab ? AppSpacing.md : AppSpacing.xs,
+        AppSpacing.sm,
+        0,
       ),
       child: Row(
         children: [
-          // Back button
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            iconSize: 20,
-            color: AppColors.primaryBright,
-            tooltip: 'Back',
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          const SizedBox(width: AppSpacing.xs),
+          // Back button — hidden when rendered as a tab
+          if (!widget.isTab) ...[
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded),
+              iconSize: 20,
+              color: AppColors.primaryBright,
+              tooltip: 'Back',
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            const SizedBox(width: AppSpacing.xs),
+          ],
+
+          // Section icon (shown only in tab mode for visual balance)
+          if (widget.isTab) ...[
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.primaryGlass,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+                border: Border.all(color: AppColors.blueGlow20, width: 1),
+              ),
+              child: const Icon(
+                Icons.person_rounded,
+                color: AppColors.primaryBright,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+          ],
+
           Text('Profile', style: AppTextStyles.h3),
           const Spacer(),
           // Edit name shortcut

@@ -22,7 +22,7 @@ import '../../core/theme/app_text_styles.dart';
 import '../controllers/phone_login_controller.dart';
 import '../services/firebase_phone_auth_service.dart';
 import '../services/user_profile_service.dart';
-import '../../home/vpi_dashboard_screen.dart';
+import '../../home/shell/main_shell.dart';
 import 'phone_otp_screen.dart';
 import 'profile_completion_screen.dart';
 
@@ -170,7 +170,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen>
   void _navigateToDashboard(User user) {
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(
-        pageBuilder: (_, a, _) => VpiDashboardScreen(user: user),
+        pageBuilder: (_, a, _) => MainShell(user: user),
         transitionsBuilder: (_, a, _, child) => FadeTransition(
           opacity: CurvedAnimation(parent: a, curve: Curves.easeInOut),
           child: child,

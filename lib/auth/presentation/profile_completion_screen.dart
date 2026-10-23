@@ -24,7 +24,7 @@ import '../../core/theme/app_decorations.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../services/user_profile_service.dart';
-import '../../home/vpi_dashboard_screen.dart';
+import '../../home/shell/main_shell.dart';
 
 class ProfileCompletionScreen extends StatefulWidget {
   final User user;
@@ -88,7 +88,7 @@ class _ProfileCompletionScreenState extends State<ProfileCompletionScreen> {
     // cannot press Back to return to profile completion.
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(
-        pageBuilder: (_, animation, _) => VpiDashboardScreen(user: widget.user),
+        pageBuilder: (_, animation, _) => MainShell(user: widget.user),
         transitionsBuilder: (_, animation, _, child) => FadeTransition(
           opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
           child: child,

@@ -436,13 +436,15 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         indicatorColor: AppColors.blueGlow20,
         elevation: 0,
-        height: 68,
+        height: 72,
+        shadowColor: AppColors.blueGlow20,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final active = states.contains(WidgetState.selected);
           return GoogleFonts.inter(
             fontSize: 11,
             fontWeight: active ? FontWeight.w600 : FontWeight.w400,
             color: active ? AppColors.primaryBright : AppColors.textMuted,
+            letterSpacing: active ? 0.3 : 0,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {

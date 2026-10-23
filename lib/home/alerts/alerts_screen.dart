@@ -23,11 +23,15 @@ import '../../core/theme/app_text_styles.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 
 class AlertsScreen extends StatelessWidget {
-  /// Unread alert count passed from the dashboard.
+  /// Unread alert count passed from the shell / dashboard.
   /// Kept as a parameter so future stages can pass real data.
   final int unreadCount;
 
-  const AlertsScreen({super.key, this.unreadCount = 0});
+  /// When [true] this screen is rendered as a bottom-nav tab body.
+  /// The back button is hidden — the user switches tabs instead.
+  final bool isTab;
+
+  const AlertsScreen({super.key, this.unreadCount = 0, this.isTab = false});
 
   @override
   Widget build(BuildContext context) {
@@ -71,21 +75,47 @@ class AlertsScreen extends StatelessWidget {
 
   Widget _buildTopBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
+      padding: EdgeInsets.fromLTRB(
+        // When shown as a tab there's no back button, so use standard page
+        // padding. When pushed as a route keep the tighter inset.
+        isTab ? AppSpacing.base : AppSpacing.sm,
+        isTab ? AppSpacing.md : AppSpacing.xs,
+        AppSpacing.sm,
+        0,
       ),
       child: Row(
         children: [
-          // Back button
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            iconSize: 20,
-            color: AppColors.primaryBright,
-            tooltip: 'Back',
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          const SizedBox(width: AppSpacing.xs),
+          // Back button — hidden when rendered as a tab
+          if (!isTab) ...[
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded),
+              iconSize: 20,
+              color: AppColors.primaryBright,
+              tooltip: 'Back',
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            const SizedBox(width: AppSpacing.xs),
+          ],
+
+          // Section icon (shown only in tab mode for visual balance)
+          if (isTab) ...[
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: AppColors.primaryGlass,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSM),
+                border: Border.all(color: AppColors.blueGlow20, width: 1),
+              ),
+              child: const Icon(
+                Icons.notifications_none_rounded,
+                color: AppColors.primaryBright,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+          ],
+
           Text('Alerts', style: AppTextStyles.h3),
           if (unreadCount > 0) ...[
             const SizedBox(width: AppSpacing.sm),

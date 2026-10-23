@@ -25,11 +25,12 @@ import 'trust_record.dart';
 
 class TrustRepository {
   TrustRepository({FirebaseFirestore? firestore})
-      : _db = firestore ??
-            FirebaseFirestore.instanceFor(
-              app: Firebase.app(),
-              databaseId: 'vpi-db',
-            );
+    : _db =
+          firestore ??
+          FirebaseFirestore.instanceFor(
+            app: Firebase.app(),
+            databaseId: 'vpi-db',
+          );
 
   final FirebaseFirestore _db;
 
@@ -45,34 +46,40 @@ class TrustRepository {
   /// Returns [TrustFailed] on network / permission errors.
   Future<TrustState> fetch(User user) async {
     try {
-      // Attempt server + cache fetch.
-      DocumentSnapshot<Map<String, dynamic>> snap;
       bool fromCache = false;
+      late final DocumentSnapshot<Map<String, dynamic>> snap;
 
       try {
-        snap = await _db
+        final result = await _db
             .collection(_kCollection)
             .doc(user.uid)
             .get(const GetOptions(source: Source.serverAndCache))
-            .timeout(_kTimeout, onTimeout: () {
-          throw FirebaseException(
-            plugin: 'cloud_firestore',
-            code: 'deadline-exceeded',
-            message: 'Trust data fetch timed out.',
-          );
-        });
-        fromCache = snap.metadata.isFromCache;
-      } on FirebaseException catch (e) when (e.code == 'deadline-exceeded') {
-        // Fall back to cache-only to give the user something to look at.
-        snap = await _db
-            .collection(_kCollection)
-            .doc(user.uid)
-            .get(const GetOptions(source: Source.cache));
-        fromCache = true;
+            .timeout(
+              _kTimeout,
+              onTimeout: () {
+                throw FirebaseException(
+                  plugin: 'cloud_firestore',
+                  code: 'deadline-exceeded',
+                  message: 'Trust data fetch timed out.',
+                );
+              },
+            );
+        snap = result;
+        fromCache = result.metadata.isFromCache;
+      } on FirebaseException catch (e) {
+        if (e.code == 'deadline-exceeded') {
+          // Fall back to cache-only to give the user something to look at.
+          snap = await _db
+              .collection(_kCollection)
+              .doc(user.uid)
+              .get(const GetOptions(source: Source.cache));
+          fromCache = true;
+        } else {
+          rethrow;
+        }
       }
 
       if (!snap.exists || snap.data() == null) {
-        // Document doesn't exist yet — return an empty record, not an error.
         return TrustLoaded(TrustRecord.empty());
       }
 

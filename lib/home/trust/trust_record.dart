@@ -16,6 +16,7 @@
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' show immutable;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // VerificationStatus
@@ -157,7 +158,10 @@ class TrustRecord {
   ///
   /// Lenient: any absent, null, or unrecognised field is treated as the safe
   /// default rather than throwing.
-  factory TrustRecord.fromMap(Map<String, dynamic> map, {bool isCached = false}) {
+  factory TrustRecord.fromMap(
+    Map<String, dynamic> map, {
+    bool isCached = false,
+  }) {
     return TrustRecord(
       score: _intOrNull(map['trustScore']),
       scoreUpdatedAt: _tsToDateTime(map['trustScoreUpdatedAt']),
